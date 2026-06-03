@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0d14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>MonPlanning — Rappels & Motivation</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0d14;
+  --surface: #11151e;
+  --card: #161b26;
+  --border: #1f2738;
+  --border2: #2a3448;
+  --accent: #6c63ff;
+  --accent2: #ff6b6b;
+  --green: #06d6a0;
+  --yellow: #ffd166;
+  --orange: #f77f00;
+  --text: #eef0f7;
+  --muted: #4e5a72;
+  --muted2: #8892aa;
+  --radius: 18px;
+  --mono: 'DM Mono', monospace;
+  --font: 'Outfit', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 700px 500px at 50% -10%, rgba(108,99,255,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 400px 300px at 90% 90%, rgba(6,214,160,.07) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+
+.app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 0 100px; }
+
+/* ── HEADER ── */
+.header {
+  padding: 48px 24px 24px;
+  background: linear-gradient(180deg, rgba(108,99,255,.1) 0%, transparent 100%);
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.greeting { font-size: .85rem; color: var(--muted2); font-weight: 400; }
+.date-badge {
+  font-family: var(--mono); font-size: .72rem;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 4px 10px; color: var(--muted2);
+}
+.header h1 {
+  font-size: 1.9rem; font-weight: 800;
+  letter-spacing: -0.04em; line-height: 1.1;
+  margin-bottom: 4px;
+}
+.header h1 span { color: var(--accent); }
+.header-sub { font-size: .88rem; color: var(--muted2); font-weight: 300; }
+
+/* ── MOTIVATION CARD ── */
+.motiv-card {
+  margin: 0 16px 24px;
+  background: linear-gradient(135deg, #1a1440 0%, #0f1a2e 100%);
+  border: 1px solid rgba(108,99,255,.3);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.motiv-card::before {
+  content: '💬';
+  position: absolute; top: -10px; right: -10px;
+  font-size: 70px; opacity: .07;
+}
+.motiv-label {
+  font-size: .7rem; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--accent); margin-bottom: 10px; font-weight: 600;
+}
+.motiv-text {
+  font-size: 1rem; font-weight: 500; line-height: 1.55;
+  color: #c8d0e8;
+  font-style: italic;
+}
+.motiv-author { font-size: .78rem; color: var(--muted2); margin-top: 8px; }
+.btn-motiv {
+  position: absolute; bottom: 14px; right: 14px;
+  background: rgba(108,99,255,.15); border: 1px solid rgba(108,99,255,.3);
+  color: var(--accent); border-radius: 8px; padding: 5px 10px;
+  font-size: .75rem; font-family: var(--font); cursor: pointer;
+  transition: all .15s;
+}
+.btn-motiv:hover { background: rgba(108,99,255,.3); }
+
+/* ── NOTIFY BANNER ── */
+.notify-banner {
+  margin: 0 16px 20px;
+  background: rgba(255,209,102,.08);
+  border: 1px solid rgba(255,209,102,.2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: background .15s;
+}
+.notify-banner:hover { background: rgba(255,209,102,.13); }
+.notify-banner p { font-size: .85rem; color: #d4a800; line-height: 1.4; }
+.notify-banner span { font-size: 22px; }
+#notifyStatus { font-size: .72rem; color: var(--muted2); margin-top: 2px; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 6px;
+  padding: 0 16px; margin-bottom: 20px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 14px;
+  font-size: .82rem; font-family: var(--font); font-weight: 500;
+  color: var(--muted2); cursor: pointer; transition: all .15s;
+  white-space: nowrap;
+}
+.tab.active {
+  background: var(--accent); border-color: var(--accent);
+  color: #fff; font-weight: 700;
+  box-shadow: 0 4px 16px rgba(108,99,255,.35);
+}
+
+/* ── DAY SECTION ── */
+.day-section { padding: 0 16px; margin-bottom: 8px; }
+.day-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.day-title {
+  font-size: 1rem; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.day-count {
+  font-family: var(--mono); font-size: .72rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 2px 8px; color: var(--muted2);
+}
+
+/* ── TASK CARD ── */
+.task-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+  display: flex; gap: 14px; align-items: flex-start;
+  transition: border-color .2s, transform .15s;
+  position: relative; overflow: hidden;
+}
+.task-card:hover { border-color: var(--border2); transform: translateX(3px); }
+.task-card.done { opacity: .5; }
+.task-card.done .task-title { text-decoration: line-through; }
+
+.task-left {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  min-width: 52px;
+}
+.task-time-start {
+  font-family: var(--mono); font-size: .78rem; font-weight: 500;
+  color: var(--text);
+}
+.task-time-line {
+  width: 1px; height: 20px;
+  background: linear-gradient(to bottom, var(--border2), transparent);
+}
+.task-time-end {
+  font-family: var(--mono); font-size: .7rem; color: var(--muted2);
+}
+
+.task-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  margin-top: 6px; flex-shrink: 0;
+}
+
+.task-body { flex: 1; }
+.task-title { font-size: .95rem; font-weight: 600; margin-bottom: 4px; }
+.task-desc { font-size: .8rem; color: var(--muted2); line-height: 1.5; }
+.task-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.tag {
+  font-size: .68rem; padding: 2px 8px; border-radius: 6px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+}
+
+.task-actions {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.btn-task {
+  width: 28px; height: 28px; border-radius: 8px;
+  border: 1px solid var(--border2); background: transparent;
+  color: var(--muted2); cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.btn-task.check:hover { border-color: var(--green); color: var(--green); background: rgba(6,214,160,.08); }
+.btn-task.edit:hover  { border-color: var(--accent); color: var(--accent); background: rgba(108,99,255,.08); }
+.btn-task.del:hover   { border-color: var(--accent2); color: var(--accent2); background: rgba(255,107,107,.08); }
+.btn-task.done-active { border-color: var(--green); color: var(--green); background: rgba(6,214,160,.15); }
+
+/* ── EMPTY ── */
+.empty-day {
+  text-align: center; padding: 30px 20px;
+  color: var(--muted); font-size: .85rem;
+}
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: 28px; right: 24px;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #9b59ff);
+  border: none; color: #fff; font-size: 26px;
+  cursor: pointer; z-index: 50;
+  box-shadow: 0 8px 28px rgba(108,99,255,.5);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .2s, box-shadow .2s;
+}
+.fab:hover { transform: scale(1.08); box-shadow: 0 12px 36px rgba(108,99,255,.6); }
+.fab:active { transform: scale(.95); }
+
+/* ── OVERLAY / MODAL ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+  display: none; align-items: flex-end; justify-content: center;
+  z-index: 100;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 24px 24px 0 0;
+  padding: 28px 24px 40px;
+  width: 100%; max-width: 480px;
+  max-height: 92vh; overflow-y: auto;
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.modal-handle {
+  width: 40px; height: 4px; border-radius: 2px;
+  background: var(--border2); margin: 0 auto 24px;
+}
+.modal-title {
+  font-size: 1.2rem; font-weight: 800; margin-bottom: 22px;
+  letter-spacing: -0.02em;
+}
+
+.form-group { margin-bottom: 16px; }
+label { display: block; font-size: .78rem; color: var(--muted2); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; font-weight: 600; }
+input, select, textarea {
+  width: 100%;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 12px 14px;
+  color: var(--text); font-family: var(--font); font-size: .92rem;
+  outline: none; transition: border-color .15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: none; height: 80px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.color-picker { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.color-opt {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer;
+  transition: transform .15s, border-color .15s;
+}
+.color-opt.selected { border-color: #fff; transform: scale(1.15); }
+
+.btn-submit {
+  width: 100%; margin-top: 8px;
+  background: linear-gradient(135deg, var(--accent), #9b59ff);
+  color: #fff; border: none; border-radius: 14px;
+  padding: 15px; font-family: var(--font);
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+  transition: opacity .2s, transform .15s;
+  box-shadow: 0 6px 20px rgba(108,99,255,.35);
+}
+.btn-submit:hover { opacity: .9; transform: translateY(-1px); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 100px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 12px 20px;
+  font-size: .88rem; color: var(--text);
+  opacity: 0; transition: all .3s; z-index: 200;
+  white-space: nowrap; pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="greeting" id="greeting">Bonjour 👋</div>
+      <div class="date-badge" id="dateBadge">—</div>
+    </div>
+    <h1>Mon <span>Planning</span><br>de la semaine</h1>
+    <div class="header-sub">Organisé, motivé, inarrêtable.</div>
+  </div>
+
+  <!-- MOTIVATION -->
+  <div class="motiv-card">
+    <div class="motiv-label">✨ Citation du jour</div>
+    <div class="motiv-text" id="motivText">Chargement...</div>
+    <div class="motiv-author" id="motivAuthor"></div>
+    <button class="btn-motiv" onclick="nextMotiv()">↻ Nouvelle</button>
+  </div>
+
+  <!-- NOTIFICATION BANNER -->
+  <div class="notify-banner" id="notifyBanner" onclick="requestNotifs()">
+    <span>🔔</span>
+    <div>
+      <p><strong>Activer les rappels</strong><br>Reçois une notification avant chaque activité.</p>
+      <div id="notifyStatus">Appuie ici pour activer</div>
+    </div>
+  </div>
+
+  <!-- TABS JOURS -->
+  <div class="tabs" id="tabs"></div>
+
+  <!-- CONTENU DU JOUR -->
+  <div id="dayContent"></div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openModal()">＋</button>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">➕ Nouvelle activité</div>
+
+    <div class="form-group">
+      <label>Titre de l'activité *</label>
+      <input id="f-title" type="text" placeholder="ex: Réunion crypto, Sport, Prière du soir...">
+    </div>
+    <div class="form-group">
+      <label>Description (optionnel)</label>
+      <textarea id="f-desc" placeholder="Détails, lieu, notes..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Jour *</label>
+      <select id="f-day">
+        <option value="0">Lundi</option>
+        <option value="1">Mardi</option>
+        <option value="2">Mercredi</option>
+        <option value="3">Jeudi</option>
+        <option value="4">Vendredi</option>
+        <option value="5">Samedi</option>
+        <option value="6">Dimanche</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Heure de début *</label>
+        <input id="f-start" type="time">
+      </div>
+      <div class="form-group">
+        <label>Heure de fin</label>
+        <input id="f-end" type="time">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Catégorie</label>
+      <select id="f-cat">
+        <option value="travail">💼 Travail / Business</option>
+        <option value="crypto">₿ Crypto</option>
+        <option value="sport">🏃 Sport / Santé</option>
+        <option value="spirituel">🙏 Spirituel</option>
+        <option value="famille">👨‍👩‍👧 Famille</option>
+        <option value="perso">🎯 Personnel</option>
+        <option value="autre">📌 Autre</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Couleur</label>
+      <div class="color-picker" id="colorPicker"></div>
+    </div>
+    <div class="form-group">
+      <label>Rappel avant l'activité</label>
+      <select id="f-remind">
+        <option value="0">Pas de rappel</option>
+        <option value="5">5 minutes avant</option>
+        <option value="10" selected>10 minutes avant</option>
+        <option value="15">15 minutes avant</option>
+        <option value="30">30 minutes avant</option>
+        <option value="60">1 heure avant</option>
+      </select>
+    </div>
+
+    <button class="btn-submit" onclick="saveTask()">💾 Enregistrer l'activité</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DONNÉES ──────────────────────────────────────────────
+let tasks = JSON.parse(localStorage.getItem('mp_tasks') || '[]');
+let editIdx = -1;
+let activeDay = new Date().getDay(); // 0=dim, 1=lun...
+// Convertir Sunday=0 en notre système Lun=0
+activeDay = activeDay === 0 ? 6 : activeDay - 1;
+
+const DAYS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const DAYS_SHORT = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const DAYS_EMOJI = ['💼','📅','🌿','⚡','🎯','🌟','🙏'];
+
+const CATS = {
+  travail:   { label: '💼 Travail',   color: '#4da6ff', bg: 'rgba(77,166,255,.12)'  },
+  crypto:    { label: '₿ Crypto',     color: '#ffd166', bg: 'rgba(255,209,102,.12)' },
+  sport:     { label: '🏃 Sport',     color: '#06d6a0', bg: 'rgba(6,214,160,.12)'   },
+  spirituel: { label: '🙏 Spirituel', color: '#c77dff', bg: 'rgba(199,125,255,.12)' },
+  famille:   { label: '👨‍👩‍👧 Famille', color: '#ff6b6b', bg: 'rgba(255,107,107,.12)' },
+  perso:     { label: '🎯 Perso',     color: '#06d6a0', bg: 'rgba(6,214,160,.12)'   },
+  autre:     { label: '📌 Autre',     color: '#8892aa', bg: 'rgba(136,146,170,.12)' },
+};
+
+const COLORS = ['#6c63ff','#ff6b6b','#06d6a0','#ffd166','#4da6ff','#c77dff','#f77f00','#ff006e'];
+
+// ── CITATIONS ────────────────────────────────────────────
+const CITATIONS = [
+  { t: "La discipline est le pont entre les objectifs et les accomplissements.", a: "Jim Rohn" },
+  { t: "Le succès n'est pas final, l'échec n'est pas fatal. C'est le courage de continuer qui compte.", a: "Winston Churchill" },
+  { t: "Chaque matin tu as deux choix : continuer à dormir avec tes rêves, ou te lever et les réaliser.", a: "Anonyme" },
+  { t: "Les grands résultats nécessitent des grands efforts. Ne cherche pas les raccourcis.", a: "Anonyme" },
+  { t: "Ce que tu fais aujourd'hui peut améliorer tous tes demains.", a: "Ralph Marston" },
+  { t: "Le secret pour aller de l'avant, c'est de commencer.", a: "Mark Twain" },
+  { t: "Travaille en silence. Laisse ton succès faire le bruit.", a: "Frank Ocean" },
+  { t: "La motivation te met en marche, mais c'est l'habitude qui te maintient en mouvement.", a: "Jim Ryun" },
+  { t: "Peu importe ta lenteur, tu vas toujours plus vite que celui qui ne bouge pas.", a: "Confucius" },
+  { t: "L'avenir appartient à ceux qui croient en la beauté de leurs rêves.", a: "Eleanor Roosevelt" },
+  { t: "Ne compte pas les jours, fais que les jours comptent.", a: "Muhammad Ali" },
+  { t: "Un petit progrès chaque jour mène à de grands résultats.", a: "Anonyme" },
+];
+let motivIdx = Math.floor(Math.random() * CITATIONS.length);
+function showMotiv() {
+  const c = CITATIONS[motivIdx];
+  document.getElementById('motivText').textContent = `« ${c.t} »`;
+  document.getElementById('motivAuthor').textContent = `— ${c.a}`;
+}
+function nextMotiv() {
+  motivIdx = (motivIdx + 1) % CITATIONS.length;
+  showMotiv();
+}
+
+// ── HEADER ───────────────────────────────────────────────
+function initHeader() {
+  const now = new Date();
+  const h = now.getHours();
+  const greet = h < 12 ? 'Bonjour 🌅' : h < 18 ? 'Bon après-midi ☀️' : 'Bonsoir 🌙';
+  document.getElementById('greeting').textContent = greet;
+  document.getElementById('dateBadge').textContent =
+    now.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+}
+
+// ── TABS ─────────────────────────────────────────────────
+function renderTabs() {
+  const el = document.getElementById('tabs');
+  el.innerHTML = '';
+  DAYS.forEach((d, i) => {
+    const count = tasks.filter(t => t.day == i).length;
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (i === activeDay ? ' active' : '');
+    btn.innerHTML = `${DAYS_EMOJI[i]} ${DAYS_SHORT[i]}${count ? ` <span style="opacity:.7;font-size:.7rem">(${count})</span>` : ''}`;
+    btn.onclick = () => { activeDay = i; renderTabs(); renderDay(); };
+    el.appendChild(btn);
+  });
+}
+
+// ── RENDER DAY ───────────────────────────────────────────
+function renderDay() {
+  const el = document.getElementById('dayContent');
+  const dayTasks = tasks
+    .map((t, i) => ({ ...t, _idx: i }))
+    .filter(t => t.day == activeDay)
+    .sort((a, b) => a.start.localeCompare(b.start));
+
+  el.innerHTML = '';
+  const sec = document.createElement('div');
+  sec.className = 'day-section';
+
+  const hdr = document.createElement('div');
+  hdr.className = 'day-header';
+  hdr.innerHTML = `
+    <div class="day-title">${DAYS_EMOJI[activeDay]} ${DAYS[activeDay]}</div>
+    <div class="day-count">${dayTasks.length} activité${dayTasks.length !== 1 ? 's' : ''}</div>
+  `;
+  sec.appendChild(hdr);
+
+  if (!dayTasks.length) {
+    sec.innerHTML += `<div class="empty-day">😴 Aucune activité ce jour.<br>Appuie sur <strong>＋</strong> pour en ajouter une !</div>`;
+  } else {
+    dayTasks.forEach(t => {
+      const cat = CATS[t.cat] || CATS.autre;
+      const card = document.createElement('div');
+      card.className = 'task-card' + (t.done ? ' done' : '');
+      card.innerHTML = `
+        <div class="task-left">
+          <div class="task-time-start">${t.start}</div>
+          ${t.end ? `<div class="task-time-line"></div><div class="task-time-end">${t.end}</div>` : ''}
+        </div>
+        <div class="task-dot" style="background:${t.color || cat.color}"></div>
+        <div class="task-body">
+          <div class="task-title">${t.title}</div>
+          ${t.desc ? `<div class="task-desc">${t.desc}</div>` : ''}
+          <div class="task-tags">
+            <span class="tag" style="background:${cat.bg};color:${cat.color}">${cat.label}</span>
+            ${t.remind > 0 ? `<span class="tag" style="background:rgba(255,209,102,.1);color:#ffd166">🔔 −${t.remind}min</span>` : ''}
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="btn-task check ${t.done ? 'done-active' : ''}" onclick="toggleDone(${t._idx})" title="Marquer fait">✓</button>
+          <button class="btn-task edit" onclick="editTask(${t._idx})" title="Modifier">✏</button>
+          <button class="btn-task del" onclick="deleteTask(${t._idx})" title="Supprimer">✕</button>
+        </div>
+      `;
+      sec.appendChild(card);
+    });
+  }
+  el.appendChild(sec);
+}
+
+// ── ACTIONS ──────────────────────────────────────────────
+function toggleDone(i) {
+  tasks[i].done = !tasks[i].done;
+  save(); renderDay();
+  toast(tasks[i].done ? '✅ Activité marquée comme faite !' : '↩️ Activité réouverte');
+}
+function deleteTask(i) {
+  if (confirm(`Supprimer "${tasks[i].title}" ?`)) {
+    tasks.splice(i, 1); save(); renderTabs(); renderDay();
+    toast('🗑 Activité supprimée');
+  }
+}
+function editTask(i) { openModal(i); }
+
+// ── MODAL ────────────────────────────────────────────────
+let selectedColor = COLORS[0];
+function openModal(idx = -1) {
+  editIdx = idx;
+  buildColorPicker();
+  document.getElementById('modalTitle').textContent = idx >= 0 ? '✏️ Modifier l\'activité' : '➕ Nouvelle activité';
+  if (idx >= 0) {
+    const t = tasks[idx];
+    document.getElementById('f-title').value  = t.title;
+    document.getElementById('f-desc').value   = t.desc || '';
+    document.getElementById('f-day').value    = t.day;
+    document.getElementById('f-start').value  = t.start;
+    document.getElementById('f-end').value    = t.end || '';
+    document.getElementById('f-cat').value    = t.cat;
+    document.getElementById('f-remind').value = t.remind || 0;
+    selectedColor = t.color || COLORS[0];
+  } else {
+    document.getElementById('f-title').value  = '';
+    document.getElementById('f-desc').value   = '';
+    document.getElementById('f-day').value    = activeDay;
+    document.getElementById('f-start').value  = '';
+    document.getElementById('f-end').value    = '';
+    document.getElementById('f-cat').value    = 'travail';
+    document.getElementById('f-remind').value = 10;
+    selectedColor = COLORS[0];
+  }
+  buildColorPicker();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+function closeOnOverlay(e) { if (e.target.id === 'overlay') closeModal(); }
+
+function buildColorPicker() {
+  const el = document.getElementById('colorPicker');
+  el.innerHTML = '';
+  COLORS.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'color-opt' + (c === selectedColor ? ' selected' : '');
+    d.style.background = c;
+    d.onclick = () => { selectedColor = c; buildColorPicker(); };
+    el.appendChild(d);
+  });
+}
+
+function saveTask() {
+  const title = document.getElementById('f-title').value.trim();
+  const start = document.getElementById('f-start').value;
+  if (!title || !start) { toast('⚠️ Titre et heure de début obligatoires !'); return; }
+
+  const task = {
+    title,
+    desc:   document.getElementById('f-desc').value.trim(),
+    day:    parseInt(document.getElementById('f-day').value),
+    start,
+    end:    document.getElementById('f-end').value,
+    cat:    document.getElementById('f-cat').value,
+    remind: parseInt(document.getElementById('f-remind').value),
+    color:  selectedColor,
+    done:   false,
+  };
+
+  if (editIdx >= 0) { tasks[editIdx] = { ...tasks[editIdx], ...task }; }
+  else { tasks.push(task); }
+
+  save();
+  scheduleNotif(task);
+  closeModal();
+  renderTabs(); renderDay();
+  toast(editIdx >= 0 ? '✅ Activité modifiée !' : '✅ Activité ajoutée !');
+}
+
+// ── NOTIFICATIONS ────────────────────────────────────────
+async function requestNotifs() {
+  if (!('Notification' in window)) {
+    toast('❌ Notifications non supportées sur ce navigateur'); return;
+  }
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    document.getElementById('notifyStatus').textContent = '✅ Rappels activés !';
+    document.getElementById('notifyBanner').style.borderColor = 'rgba(6,214,160,.3)';
+    document.getElementById('notifyBanner').style.background  = 'rgba(6,214,160,.07)';
+    toast('🔔 Rappels activés avec succès !');
+    scheduleAllNotifs();
+  } else {
+    toast('❌ Permission refusée. Active les notifications dans les paramètres.');
+  }
+}
+
+function scheduleNotif(task) {
+  if (!task.remind || Notification.permission !== 'granted') return;
+  const now = new Date();
+  const today = now.toDateString();
+  // Trouve le prochain jour correspondant
+  const todayIdx = now.getDay() === 0 ? 6 : now.getDay() - 1;
+  let daysAhead = task.day - todayIdx;
+  if (daysAhead < 0) daysAhead += 7;
+  const taskDate = new Date(now);
+  taskDate.setDate(now.getDate() + daysAhead);
+  const [h, m] = task.start.split(':').map(Number);
+  taskDate.setHours(h, m - task.remind, 0, 0);
+  const delay = taskDate.getTime() - Date.now();
+  if (delay > 0) {
+    setTimeout(() => {
+      new Notification(`⏰ Rappel : ${task.title}`, {
+        body: `Dans ${task.remind} min — ${task.start}${task.end ? ' → ' + task.end : ''}${task.desc ? '\n' + task.desc : ''}`,
+        icon: '📅',
+      });
+    }, delay);
+  }
+}
+
+function scheduleAllNotifs() {
+  tasks.forEach(t => scheduleNotif(t));
+}
+
+// ── SAVE ─────────────────────────────────────────────────
+function save() { localStorage.setItem('mp_tasks', JSON.stringify(tasks)); }
+
+// ── TOAST ────────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ── INIT ─────────────────────────────────────────────────
+initHeader();
+showMotiv();
+renderTabs();
+renderDay();
+if (Notification.permission === 'granted') {
+  document.getElementById('notifyStatus').textContent = '✅ Rappels déjà activés';
+  scheduleAllNotifs();
+}
+// Changer citation toutes les heures
+setInterval(nextMotiv, 3600000);
+</script>
+</body>
+</html>
